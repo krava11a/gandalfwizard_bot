@@ -21,7 +21,7 @@ public class GandalfWizardTelegramBot extends TelegramWebhookBot {
     }
 
     @Override
-    public BotApiMethod onWebhookUpdateReceived(Update update) {
+    public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
 //        if (update.getMessage() != null && update.getMessage().hasText()) {
 //            long chatId = update.getMessage().getChatId();
 //
@@ -34,7 +34,7 @@ public class GandalfWizardTelegramBot extends TelegramWebhookBot {
 //        }
 //        return null;
 
-        SendMessage replyMessageToUser = telegramFacade.handleUpdate(update);
+        BotApiMethod<?> replyMessageToUser = telegramFacade.handleUpdate(update);
 
         return replyMessageToUser;
     }

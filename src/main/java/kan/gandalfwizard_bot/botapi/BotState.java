@@ -12,7 +12,8 @@ public enum BotState {
     ASK_AGE,
     ASK_NUMBER,
     ASK_SONG,
-    ASK_MOVIE;
+    ASK_MOVIE,
+    SHOW_USER_PROFILE;
 
 
 }

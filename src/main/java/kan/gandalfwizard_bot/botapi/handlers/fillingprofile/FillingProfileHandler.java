@@ -8,6 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -50,9 +56,15 @@ public class FillingProfileHandler implements InputMessageHandler {
         }
 
         if (botState.equals(BotState.ASK_GENDER)){
-            userProfileData.setAge(Integer.parseInt(usrAnswer));
-            replyToUser = replyMessageService.getReplyMessage(chatId,"reply.askGender");
-            userDataCache.setUsersCurrentBotState(usrId,BotState.ASK_COLOR);
+            try {
+                userProfileData.setAge(Integer.parseInt(usrAnswer));
+                replyToUser = replyMessageService.getReplyMessage(chatId,"reply.askGender");
+//            userDataCache.setUsersCurrentBotState(usrId,BotState.ASK_COLOR);
+                replyToUser.setReplyMarkup(getGenderButtonsMarkup());
+            }catch (NumberFormatException e){
+                replyToUser= replyMessageService.getReplyMessage(chatId,"reply.askAgeError");
+            }
+
         }
 
         if (botState.equals(BotState.ASK_COLOR)){
@@ -68,9 +80,14 @@ public class FillingProfileHandler implements InputMessageHandler {
         }
 
         if (botState.equals(BotState.ASK_MOVIE)){
-            userProfileData.setNumber(Integer.parseInt(usrAnswer));
-            replyToUser = replyMessageService.getReplyMessage(chatId,"reply.askMovie");
-            userDataCache.setUsersCurrentBotState(usrId,BotState.ASK_SONG);
+            try {
+                userProfileData.setNumber(Integer.parseInt(usrAnswer));
+                replyToUser = replyMessageService.getReplyMessage(chatId,"reply.askMovie");
+                userDataCache.setUsersCurrentBotState(usrId,BotState.ASK_SONG);
+            }catch (NumberFormatException e){
+                replyToUser = replyMessageService.getReplyMessage(chatId,"reply.askNumberError");
+            }
+
         }
 
         if (botState.equals(BotState.ASK_SONG)){
@@ -88,6 +105,28 @@ public class FillingProfileHandler implements InputMessageHandler {
         userDataCache.saveUserProfileData(usrId,userProfileData);
 
         return replyToUser;
+    }
+
+    private InlineKeyboardMarkup getGenderButtonsMarkup() {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+
+        InlineKeyboardButton buttonMan = new InlineKeyboardButton().setText("Мужской");
+        InlineKeyboardButton buttonWoman = new InlineKeyboardButton().setText("Женский");
+
+        buttonMan.setCallbackData("buttonMan");
+        buttonWoman.setCallbackData("buttonWoman");
+
+        List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
+        keyboardButtonsRow.add(buttonMan);
+        keyboardButtonsRow.add(buttonWoman);
+
+
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+        rowList.add(keyboardButtonsRow);
+
+        inlineKeyboardMarkup.setKeyboard(rowList);
+
+        return inlineKeyboardMarkup;
     }
 
     @Override

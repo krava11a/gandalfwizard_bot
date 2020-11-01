@@ -21,4 +21,7 @@ public class ReplyMessageService {
     }
 
 
+    public String getReplyText(String text) {
+        return localeMessageService.getMessage(text);
+    }
 }
